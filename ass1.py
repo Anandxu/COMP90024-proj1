@@ -48,19 +48,67 @@ def rank(mpi, dict):
         dict_data[l[0]] = l[1]
     return dict_data
 
+def transfer(abbr):
+    switcher={
+        "en":"English",
+        "ar":"Arabic",
+        "hy":"Armenian",
+        "bn":"Bengali",
+        "bg":"Bulgarian",
+        "my":"Burmese",
+        "cs":"Czech",
+        "da":"Danish",
+        "de":"German",
+        "el":"Greek",
+        "es":"Spanish",
+        "fa":"Persian",
+        "fi":"finnish",
+        "fil":"Filipino",
+        "fr":"French",
+        "he":"Hebrew",
+        "hi":"Hindi",
+        "hu":"Hungarian",
+        "in":"Indonesian",
+        "it":"Italian",
+        "ja":"Japanese",
+        "ko":"Korean",
+        "msa":"Malay",
+        "nl":"Dutch",
+        "no":"Norwegian",
+        "pl":"Polish",
+        "pt":"Portuguese",
+        "ro":"Romanian",
+        "ru":"Russian",
+        "sv":"Swedish",
+        "th":"Thai",
+        "tr":"Turkish",
+        "uk":"Ukrainian",
+        "ur":"Urdu",
+        "vi":"Vietnamese",
+        "zh-cn":"Chinese Simplified",
+        "zh-tw":"Chinese Traditional",
+        "tl":"Tagalog",
+        "und":"undifined",
+        
+    }
+    return switcher.get(abbr, "Nothing")
 
-def output(top_hashtags, top_languages):
-    i = 1
+
+
+
+
+def output(tophashtags,top_languages):
+    i=1
     print("Top 10 hashtags:")
     for k,v in top_hashtags.items():
         print(str(i)+".#"+k+","+str(v))
-        i += 1
+        i+=1
     print("")
     print("Top 10 languages:")
-    i = 1
+    i=1
     for k,v in top_languages.items():
-        print(str(i)+"."+k+","+str(v))
-        i += 1
+        print(str(i)+"."+transfer(k)+"("+k+")"+","+str(v))
+        i+=1
 
 
 if __name__ == '__main__':
