@@ -1,5 +1,10 @@
 from mpi4py import MPI
 import json
+import sys
+import io
+
+
+sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
 
 
 class Mpi:
@@ -9,7 +14,7 @@ class Mpi:
         self.rank = self.comm.Get_rank()
 
 
-def traverse(mpi, path):
+def traverse(mpi,path):
     hashtags = {}
     languages = {}
     index=0
@@ -33,44 +38,89 @@ def traverse(mpi, path):
     return hashtags, languages
 
 
-def rank(mpi, dict):
-    dict_list = mpi.comm.gather(dict, root=0)
+def gather(mpi,dict):  
+    dict_list = mpi.comm.gather(dict,root=0)
     if mpi.rank ==0:
         gather_data = {}
         for each in dict_list:
-            for k, v in each.items():
-                gather_data[k] = gather_data.get(k, 0) + v
-        
-    L = sorted(gather_data.items(), key=lambda item: item[1], reverse=True)
+            for k,v in each.items():
+                gather_data[k] = gather_data.get(k,0) + v  
+
+        return gather_data
+
+def rank(gather_data):
+    L = sorted(gather_data.items(), key = lambda item: item[1], reverse=True)
     L = L[:10]
-    dict_data = {}
-    for l in L:
-        dict_data[l[0]] = l[1]
-    return dict_data
+    return L
 
+def transfer(abbr):
+    switcher={
+        "en":"English",
+        "ar":"Arabic",
+        "hy":"Armenian",
+        "bn":"Bengali",
+        "bg":"Bulgarian",
+        "my":"Burmese",
+        "cs":"Czech",
+        "da":"Danish",
+        "de":"German",
+        "el":"Greek",
+        "es":"Spanish",
+        "fa":"Persian",
+        "fi":"finnish",
+        "fil":"Filipino",
+        "fr":"French",
+        "he":"Hebrew",
+        "hi":"Hindi",
+        "hu":"Hungarian",
+        "in":"Indonesian",
+        "it":"Italian",
+        "ja":"Japanese",
+        "ko":"Korean",
+        "msa":"Malay",
+        "nl":"Dutch",
+        "no":"Norwegian",
+        "pl":"Polish",
+        "pt":"Portuguese",
+        "ro":"Romanian",
+        "ru":"Russian",
+        "sv":"Swedish",
+        "th":"Thai",
+        "tr":"Turkish",
+        "uk":"Ukrainian",
+        "ur":"Urdu",
+        "vi":"Vietnamese",
+        "zh-cn":"Chinese Simplified",
+        "zh-tw":"Chinese Traditional",
+        "tl":"Tagalog",
+        "und":"undifined",
+        
+    }
+    return switcher.get(abbr, "Nothing")
 
-def output(top_hashtags, top_languages):
-    i = 1
+def output(top_hashtags,top_languages):
+    i=1
     print("Top 10 hashtags:")
-    for k,v in top_hashtags.items():
-        print(str(i)+".#"+k+","+str(v))
-        i += 1
+    for x in top_hashtags:
+        print(str(i)+".#"+x[0]+","+str(x[1]))
+        i+=1
     print("")
     print("Top 10 languages:")
-    i = 1
-    for k,v in top_languages.items():
-        print(str(i)+"."+k+","+str(v))
-        i += 1
-
-
+    i=1
+    for x in top_languages:
+        print(str(i)+"."+transfer(x[0])+"("+x[0]+")"+","+str(x[1]))
+        i+=1
+        
 if __name__ == '__main__':
-    mpi = Mpi()
-    path = "smallTwitter.json"
-    hashtags, languages = traverse(mpi, path)
-    top_hashtags = rank(mpi, hashtags)
-    top_languages = rank(mpi, languages)
-    
-    output(top_hashtags, top_languages)
-
+    mpi=Mpi()
+    path = "/data/projects/COMP90024/bigTwitter.json"
+    hashtags, languages = traverse(mpi,path)
+    g_hashtags = gather(mpi,hashtags)
+    g_languages = gather(mpi,languages)
+    if mpi.rank==0:
+        
+        top_hashtags=rank(g_hashtags)
+        top_languages=rank(g_languages)
+        output(top_hashtags,top_languages)
 
 
