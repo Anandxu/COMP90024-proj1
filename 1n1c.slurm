@@ -4,8 +4,6 @@
 #SBATCH --cpus-per-task=1
 #SBATCH --output=1n1c.out
 #SBATCH --time=0-12:00:00
-#SBATCH --mail-user=guoningq@student.unimelb.edu.au
-#SBATCH --mail-type=ALL
 
 
 
