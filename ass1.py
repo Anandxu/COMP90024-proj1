@@ -1,3 +1,12 @@
+"""
+Project Name: COMP90024 - HPC Twitter Processing
+Author: Guoning QI guoningq@student.unimelb.edu.au
+        Longxuan XU longxuanx@student.unimelb.edu.au
+Purpose: Identify the top 10 most frequently occurring hashtags(#) and the languages most commonly used for tweeting
+
+Updated on 2020.4.13
+"""
+
 from mpi4py import MPI
 import json
 import sys
